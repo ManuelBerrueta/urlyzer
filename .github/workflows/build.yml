@@ -34,7 +34,7 @@ jobs:
       - name: Release
         uses: goreleaser/goreleaser-action@v4
         with: 
-          args: "release --rm-dist"
+          args: "release --clean"
           version: latest
         env: 
           GITHUB_TOKEN: "${{ secrets.GITHUB_TOKEN }}"
