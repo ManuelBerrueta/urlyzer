@@ -26,3 +26,6 @@ Query Parameters:
   param2: value 2
   param1: value1
 ```
+
+# Releases
+Check out the releases tab for the binaries
