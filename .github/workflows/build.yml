@@ -1,10 +1,6 @@
 name: 🔨 Build Test
 
-on:
-  push:
-    branches: [ $default-branch ]
-  pull_request:
-    branches: [ $default-branch ]
+on: [push]
 
 jobs:
   build:
@@ -24,12 +20,5 @@ jobs:
       - name: Check out code
         uses: actions/checkout@v3
 
-      - name: Go Mod hygine
-        run: |
-          go clean -modcache
-          go mod tidy
-        working-directory: ./...
-
       - name: Build
-        run: go build -v .
-        working-directory: ./...
+        run: go build -v ./...
