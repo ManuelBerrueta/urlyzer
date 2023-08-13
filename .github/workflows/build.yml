@@ -1,32 +1,32 @@
-#name: 🛠️ Build Test
-#
-#on:
-#  push:
-#    tags:
-#      - "*"
-#
-#jobs:
-#  build:
-#    name: 🛠️ Build
-#    strategy:
-#      matrix:
-#        go-version: [1.20.x]
-#        os: [ubuntu-latest, windows-latest, macOS-latest]
-#
-#    runs-on: ${{ matrix.os }}
-#    steps:
-#      - name: Set up Go
-#        uses: actions/setup-go@v4
-#        with:
-#          go-version: ${{ matrix.go-version }}
-#
-#      - name: Check out code
-#        uses: actions/checkout@v3
-#
-#      - name: Go Mod hygine
-#        run: |
-#          go clean -modcache
-#          go mod tidy
-#
-#      - name: Build
-#        run: go build -v ./...
+name: 🛠️ Build Test
+
+on:
+  push:
+    tags:
+      - "*"
+
+jobs:
+  build:
+    name: 🛠️ Build
+    strategy:
+      matrix:
+        go-version: [1.20.x]
+        os: [ubuntu-latest, windows-latest, macOS-latest]
+
+    runs-on: ${{ matrix.os }}
+    steps:
+      - name: Set up Go
+        uses: actions/setup-go@v4
+        with:
+          go-version: ${{ matrix.go-version }}
+
+      - name: Check out code
+        uses: actions/checkout@v3
+
+      - name: Go Mod hygine
+        run: |
+          go clean -modcache
+          go mod tidy
+
+      - name: Build
+        run: go build -v ./...

@@ -9,13 +9,17 @@ If you are frustrated by this process, often repeated multiple times a day, then
 ### Features
 Offline parsing to keep your URL and Params confidential
 
-## Example use case:
-**Running the tool:**   
+## Example use cases:
+### Running the tool as a script:
 ```Shell
 go run urlyzer.go -u "https://www.example.com/path/towin?param1=value1&param2=value%202"
 ```
+### Running the tool from one of the binaries:
+```Shell
+urlyzer -u "https://www.example.com/path/towin?param1=value1&param2=value%202"
+```
 
-**Output:**
+### Example Output
 ```YAML
 Scheme: https
 Host: www.example.com
@@ -28,4 +32,4 @@ Query Parameters:
 ```
 
 # Releases
-Check out the releases tab for the binaries
+Check out the releases tab to download one of the binaries for your targeted architecture
