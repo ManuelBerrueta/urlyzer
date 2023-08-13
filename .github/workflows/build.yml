@@ -1,10 +1,10 @@
-name: 🔨 Build Test
+name: 🛠️ Build Test
 
 on: [push]
 
 jobs:
   build:
-    name: 🛠️ Build
+    name: 🛠️ Build & Release
     strategy:
       matrix:
         go-version: [1.20.x]
@@ -22,3 +22,11 @@ jobs:
 
       - name: Build
         run: go build -v ./...
+
+      - name: Release
+        uses: goreleaser/goreleaser-action@v4
+        with: 
+          args: "release --rm-dist"
+          version: latest
+        env: 
+          GITHUB_TOKEN: "${{ secrets.GITHUB_TOKEN }}"
