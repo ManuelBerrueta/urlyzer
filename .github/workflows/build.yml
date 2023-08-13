@@ -1,6 +1,9 @@
 name: 🛠️ Build Test
 
-on: [push]
+on:
+  push:
+    tags:
+      - "*"
 
 jobs:
   build:
