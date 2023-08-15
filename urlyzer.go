@@ -43,7 +43,7 @@ func main() {
 	if len(queryParams) > 0 {
 		fmt.Println("\033[1;36mQuery Parameters:\033[0m")
 		for key, values := range queryParams {
-			fmt.Printf("  %s: %s\n", key, strings.Join(values, ", "))
+			fmt.Printf("  \033[1;32m%s:\033[0m %s\n", key, strings.Join(values, ", "))
 		}
 	}
 }
