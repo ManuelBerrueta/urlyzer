@@ -7,7 +7,9 @@ There is very often times when you have a really long URL with all kinds of diff
 If you are frustrated by this process, often repeated multiple times a day, then this tool is for you!
 
 ### Features
-Offline parsing to keep your URL and Params confidential
+- Offline parsing to keep your URL and Params confidential
+- Allows you to pipe-in the url from the command line via stdin
+
 
 ## Example use cases:
 ### Running the tool as a script:
@@ -15,8 +17,13 @@ Offline parsing to keep your URL and Params confidential
 go run urlyzer.go -u "https://www.example.com/path/towin?param1=value1&param2=value%202"
 ```
 ### Running the tool from one of the binaries:
+**Simple Tool Use:**
 ```Shell
-urlyzer -u "https://www.example.com/path/towin?param1=value1&param2=value%202"
+urlyzer -u "https://www.example.com/path/towin?param1=value1&param2=value%202#MyFragment"
+```
+**Piped Input:**
+```Shell
+echo "https://www.example.com/path/towin?param1=value1&param2=value%202#MyFragment" | urlyzer 
 ```
 
 ### Example Output
@@ -29,6 +36,7 @@ Query String: param1=value1&param2=value%202
 Query Parameters:
   param2: value 2
   param1: value1
+Fragment: MyFragment
 ```
 
 # Releases
