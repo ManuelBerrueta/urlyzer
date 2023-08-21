@@ -3,6 +3,7 @@ package main
 import (
 	"flag"
 	"fmt"
+	"io"
 	"log"
 	"net/url"
 	"os"
@@ -13,12 +14,23 @@ func main() {
 	urlFlag := flag.String("u", "", "URL to parse")
 	flag.Parse()
 
-	if *urlFlag == "" {
-		fmt.Println("Please provide a URL using the -u flag.")
-		os.Exit(1)
+	var inputURL string
+
+	// Check if input is being piped
+	stat, _ := os.Stdin.Stat()
+	if (stat.Mode() & os.ModeCharDevice) == 0 {
+		// Read URL from standard input
+		inputBytes, _ := io.ReadAll(os.Stdin)
+		inputURL = strings.TrimSpace(string(inputBytes))
+	} else {
+		if *urlFlag == "" {
+			fmt.Println("Please provide a URL using the -u flag.")
+			os.Exit(1)
+		}
+		inputURL = *urlFlag
 	}
 
-	parsedURL, err := url.Parse(*urlFlag)
+	parsedURL, err := url.Parse(inputURL)
 	if err != nil {
 		log.Fatalf("Error parsing URL: %v", err)
 	}
@@ -46,4 +58,7 @@ func main() {
 			fmt.Printf("  \033[1;32m%s:\033[0m %s\n", key, strings.Join(values, ", "))
 		}
 	}
+
+	// Fragment (Hash)
+	fmt.Printf("\033[1;36mFragment:\033[0m %s\n", parsedURL.Fragment)
 }
