@@ -14,12 +14,12 @@ If you are frustrated by this process, often repeated multiple times a day, then
 ## Example use cases:
 ### Running the tool as a script:
 ```Shell
-go run urlyzer.go -u "https://www.example.com/path/towin?param1=value1&param2=value%202"
+go run urlyzer.go "https://www.example.com/path/towin?param1=value1&param2=value%202"
 ```
 ### Running the tool from one of the binaries:
 **Simple Tool Use:**
 ```Shell
-urlyzer -u "https://www.example.com/path/towin?param1=value1&param2=value%202#MyFragment"
+urlyzer "https://www.example.com/path/towin?param1=value1&param2=value%202#MyFragment"
 ```
 **Piped Input:**
 ```Shell

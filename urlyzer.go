@@ -11,7 +11,6 @@ import (
 )
 
 func main() {
-	urlFlag := flag.String("u", "", "URL to parse")
 	flag.Parse()
 
 	var inputURL string
@@ -22,12 +21,11 @@ func main() {
 		// Read URL from standard input
 		inputBytes, _ := io.ReadAll(os.Stdin)
 		inputURL = strings.TrimSpace(string(inputBytes))
+	} else if len(flag.Args()) > 0 {
+		inputURL = flag.Arg(0)
 	} else {
-		if *urlFlag == "" {
-			fmt.Println("Please provide a URL using the -u flag.")
-			os.Exit(1)
-		}
-		inputURL = *urlFlag
+		fmt.Println("Please provide a URL as a command line argument or through standard input.")
+		os.Exit(1)
 	}
 
 	parsedURL, err := url.Parse(inputURL)
@@ -38,27 +36,38 @@ func main() {
 	// Scheme (Protocol)
 	fmt.Printf("\033[1;36mScheme:\033[0m %s\n", parsedURL.Scheme)
 
+	// UserInfo
+	if parsedURL.User.String() != "" {
+		fmt.Printf("\033[1;36mUserInfo:\033[0m %s\n", parsedURL.User)
+	}
+
 	// Host
 	fmt.Printf("\033[1;36mHost:\033[0m %s\n", parsedURL.Hostname())
 
 	// Port
-	fmt.Printf("\033[1;36mPort:\033[0m %s\n", parsedURL.Port())
+	if parsedURL.Port() != "" {
+		fmt.Printf("\033[1;36mPort:\033[0m %s\n", parsedURL.Port())
+	}
 
 	// Path
 	fmt.Printf("\033[1;36mPath:\033[0m %s\n", parsedURL.Path)
 
 	// Query String
-	fmt.Printf("\033[1;36mQuery String:\033[0m %s\n", parsedURL.RawQuery)
+	if parsedURL.RawQuery != "" {
+		fmt.Printf("\033[1;36mQuery String:\033[0m %s\n", parsedURL.RawQuery)
 
-	// Parse query parameters
-	queryParams, _ := url.ParseQuery(parsedURL.RawQuery)
-	if len(queryParams) > 0 {
-		fmt.Println("\033[1;36mQuery Parameters:\033[0m")
-		for key, values := range queryParams {
-			fmt.Printf("  \033[1;32m%s:\033[0m %s\n", key, strings.Join(values, ", "))
+		// Parse query parameters
+		queryParams, _ := url.ParseQuery(parsedURL.RawQuery)
+		if len(queryParams) > 0 {
+			fmt.Println("\033[1;36mQuery Parameters:\033[0m")
+			for key, values := range queryParams {
+				fmt.Printf("  \033[1;32m%s:\033[0m %s\n", key, strings.Join(values, ", "))
+			}
 		}
 	}
 
 	// Fragment (Hash)
-	fmt.Printf("\033[1;36mFragment:\033[0m %s\n", parsedURL.Fragment)
+	if parsedURL.Fragment != "" {
+		fmt.Printf("\033[1;36mFragment:\033[0m %s\n", parsedURL.Fragment)
+	}
 }
