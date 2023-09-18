@@ -56,7 +56,7 @@ func main() {
 
 		fmt.Printf("%sHeaders:%s\n", Green, Reset)
 		for key, value := range headers {
-			fmt.Printf("%s%s:%s %s\n", Blue, key, Reset, value)
+			fmt.Printf("  %s%s:%s %s\n", Blue, key, Reset, value)
 		}
 
 	} else { //! Regular urlyzer analysis operation
