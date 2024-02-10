@@ -73,3 +73,18 @@ echo " https://aka.ms/powershell-release?tag=lts" | ./urlyzer -f -p "http://127.
 ---    
 # Releases
 Check out the releases tab to download one of the binaries for your targeted architecture.
+
+
+---    
+# Running in a container
+Running in a container is easy with the provided Dockerfile and it doesn't any other dependencies, well other than having Docker!
+1. Clone the code
+2. Build the image by running `docker build --tag urlyzer .`
+3. Run the container with `urlyzer`: `docker run urlyzer [flag] "URL"`
+
+## Examples
+### Running regular `urlyzer`
+`docker run urlyzer "https://login.microsoftonline.com/common/oauth2/authorize?client_id=1234#revx0r.com"`
+
+### Checking final destination/redirects
+`docker run urlyzer -f "https://aka.ms/powershell-release?tag=lts"`
