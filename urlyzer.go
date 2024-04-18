@@ -26,24 +26,40 @@ func main() {
 	var proxyURL string
 	flag.StringVar(&proxyURL, "p", "", "Proxy URL (optional)")
 	checkFinalURLDestination := flag.Bool("f", false, "Check the final destination of a URL after redirects.")
+	cookies := flag.Bool("c", false, "Parse cookies from a cookie header.")
 	flag.Parse()
 
-	var inputURL string
-
 	// Check if input is being piped
+	// Check if input is being piped
+	var inputURL string
 	stat, _ := os.Stdin.Stat()
 	if (stat.Mode() & os.ModeCharDevice) == 0 {
-		// Read URL from standard input
+		// Read from standard input
 		inputBytes, _ := io.ReadAll(os.Stdin)
 		inputURL = strings.TrimSpace(string(inputBytes))
 	} else if len(flag.Args()) > 0 {
+		// Read from command line argument
 		inputURL = flag.Arg(0)
 	} else {
-		fmt.Println("Please provide a URL as a command line argument or through standard input.")
+		fmt.Println("Please provide a URL or a cookie header as a command line argument or through standard input.")
 		os.Exit(1)
 	}
 
-	if *checkFinalURLDestination {
+	if *cookies {
+		// Parse the cookie header from the input
+		cookiesMap, err := parseCookies(inputURL)
+		if err != nil {
+			fmt.Println("Error parsing cookies:", err)
+			os.Exit(1)
+		}
+
+		// Print the parsed cookies
+		fmt.Printf("%sCookies:%s\n", Green, Reset)
+		for name, value := range cookiesMap {
+			fmt.Printf("  %s%s:%s %s\n", Blue, name, Reset, value)
+		}
+
+	} else if *checkFinalURLDestination {
 		finalDestination, headers, statusCode, err := getFinalDestination(proxyURL, inputURL)
 
 		if err != nil {
@@ -154,4 +170,27 @@ func getFinalDestination(proxyURL, targetURL string) (string, http.Header, int, 
 	}
 
 	return finalDestination, resp.Header, statusCode, nil
+}
+
+func parseCookies(cookieHeader string) (map[string]string, error) {
+	cookies := make(map[string]string)
+	pairs := strings.Split(cookieHeader, ";")
+
+	for _, pair := range pairs {
+		pair = strings.TrimSpace(pair)
+		if pair == "" {
+			continue
+		}
+
+		equalIndex := strings.Index(pair, "=")
+		if equalIndex < 0 {
+			return nil, fmt.Errorf("invalid cookie pair: %s", pair)
+		}
+
+		name := pair[:equalIndex]
+		value := pair[equalIndex+1:]
+		cookies[name] = value
+	}
+
+	return cookies, nil
 }
