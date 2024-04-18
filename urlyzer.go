@@ -26,42 +26,28 @@ func main() {
 	var proxyURL string
 	flag.StringVar(&proxyURL, "p", "", "Proxy URL (optional)")
 	checkFinalURLDestination := flag.Bool("f", false, "Check the final destination of a URL after redirects.")
-	cookies := flag.String("c", "", "Parse cookies from a cookie header.")
+	cookies := flag.Bool("c", false, "Parse cookies from a cookie header.")
 	flag.Parse()
 
 	// Check if input is being piped
 	// Check if input is being piped
 	var inputURL string
-	var cookieHeader string
 	stat, _ := os.Stdin.Stat()
 	if (stat.Mode() & os.ModeCharDevice) == 0 {
 		// Read from standard input
 		inputBytes, _ := io.ReadAll(os.Stdin)
-		input := strings.TrimSpace(string(inputBytes))
-
-		if *cookies != "" {
-			// If the "-c" flag is set, the input is a cookie header
-			cookieHeader = input
-		} else {
-			// Otherwise, the input is a URL
-			inputURL = input
-		}
+		inputURL = strings.TrimSpace(string(inputBytes))
 	} else if len(flag.Args()) > 0 {
-		if *cookies != "" {
-			// If the "-c" flag is set, the argument is a cookie header
-			cookieHeader = flag.Arg(0) //*cookies
-		} else {
-			// Otherwise, the argument is a URL
-			inputURL = flag.Arg(0)
-		}
+		// Read from command line argument
+		inputURL = flag.Arg(0)
 	} else {
 		fmt.Println("Please provide a URL or a cookie header as a command line argument or through standard input.")
 		os.Exit(1)
 	}
 
-	if cookieHeader != "" {
-		// Parse the cookie header from the argument
-		cookies, err := parseCookies(cookieHeader)
+	if *cookies {
+		// Parse the cookie header from the input
+		cookiesMap, err := parseCookies(inputURL)
 		if err != nil {
 			fmt.Println("Error parsing cookies:", err)
 			os.Exit(1)
@@ -69,7 +55,7 @@ func main() {
 
 		// Print the parsed cookies
 		fmt.Printf("%sCookies:%s\n", Green, Reset)
-		for name, value := range cookies {
+		for name, value := range cookiesMap {
 			fmt.Printf("  %s%s:%s %s\n", Blue, name, Reset, value)
 		}
 
