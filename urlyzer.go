@@ -225,11 +225,11 @@ func identifySASURIType(queryParams url.Values) string {
 
 func getLongForm(sasType, key, value string) (string, string) {
 	switch sasType {
-	case "AccountSAS":
+	case "Account SAS URI":
 		return getLongFormAccountSAS(key, value)
-	case "ServiceSAS":
+	case "Service SAS URI":
 		return getLongFormServiceSAS(key, value)
-	case "DelegationSAS":
+	case "Delegation SAS URI":
 		return getLongFormDelegationSAS(key, value)
 	default:
 		return key, value // If the SAS type is unknown, return the original key and value
