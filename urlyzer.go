@@ -27,6 +27,7 @@ func main() {
 	flag.StringVar(&proxyURL, "p", "", "Proxy URL (optional)")
 	checkFinalURLDestination := flag.Bool("f", false, "Check the final destination of a URL after redirects.")
 	cookies := flag.Bool("c", false, "Parse cookies from a cookie header.")
+	sas := flag.Bool("sas", false, "Parse SAS URI & identify it's type.")
 	flag.Parse()
 
 	// Check if input is being piped
@@ -59,6 +60,22 @@ func main() {
 			fmt.Printf("  %s%s:%s %s\n", Blue, name, Reset, value)
 		}
 
+	} else if *sas {
+		parsedURL, err := url.Parse(inputURL)
+		if err != nil {
+			log.Fatalf("Error parsing URL: %v", err)
+		}
+
+		values := parsedURL.Query()
+		// Identify the type of SAS URI
+		sasType := identifySASURIType(values)
+		fmt.Printf("\033[31mSAS URI Type: %s\033[0m\n", sasType)
+
+		// Print the parsed query parameters
+		for key, value := range values {
+			longFormName, longFormValue := getLongForm(sasType, key, value[0]) // Assuming each key has only one value
+			fmt.Printf("%s=%s\t||\t%s = %s\n", key, value[0], longFormName, longFormValue)
+		}
 	} else if *checkFinalURLDestination {
 		finalDestination, headers, statusCode, err := getFinalDestination(proxyURL, inputURL)
 
@@ -193,4 +210,226 @@ func parseCookies(cookieHeader string) (map[string]string, error) {
 	}
 
 	return cookies, nil
+}
+
+// SAS URI Code:
+func identifySASURIType(queryParams url.Values) string {
+	if _, ok := queryParams["ss"]; ok {
+		return "Account SAS URI"
+	}
+	if _, ok := queryParams["sktid"]; ok {
+		return "Delegation SAS URI"
+	}
+	return "Service SAS URI"
+}
+
+func getLongForm(sasType, key, value string) (string, string) {
+	switch sasType {
+	case "AccountSAS":
+		return getLongFormAccountSAS(key, value)
+	case "ServiceSAS":
+		return getLongFormServiceSAS(key, value)
+	case "DelegationSAS":
+		return getLongFormDelegationSAS(key, value)
+	default:
+		return key, value // If the SAS type is unknown, return the original key and value
+	}
+}
+
+func getLongFormAccountSAS(key, value string) (string, string) {
+	// Mapping from short form to long form for keys
+	keyMap := map[string]string{
+		"sv":  "signedVersion",
+		"ss":  "signedServices",
+		"srt": "signedResourceTypes",
+		"sp":  "signedPermissions",
+		"st":  "signedStart Time",
+		"se":  "signedExpiry Time",
+		"sip": "signedIP",
+		"spr": "signedProtocol",
+		"ses": "signedEncriptionScope",
+		"sig": "signature",
+	}
+
+	// Mapping from short form to long form for values
+	valueMap := map[string]string{
+		"r": "Read",
+		"w": "Write",
+		"d": "Delete",
+		"y": "Permanent Delete",
+		"l": "List",
+		"a": "Add",
+		"c": "Create or Container[srt]",
+		"u": "Update",
+		"p": "Process",
+		"t": "Tag or Table[ss]",
+		"f": "Filter or File[ss]",
+		"i": "Set Immutability Policy",
+		"b": "Blob",
+		"q": "Queue",
+		"s": "Service",
+		"o": "Object",
+	}
+
+	longFormKey, ok := keyMap[key]
+	if !ok {
+		longFormKey = key // If no mapping found, use the original key
+	}
+
+	longFormValue := ""
+	//for _, char := range value {
+	//	longForm, ok := valueMap[string(char)]
+	//	if ok {
+	//		if longFormValue != "" {
+	//			longFormValue += ", "
+	//		}
+	//		longFormValue += longForm
+	//	}
+	//}
+	//if longFormValue == "" {
+	//	longFormValue = value // If no mapping found, use the original value
+	//}
+
+	switch key {
+	case "ss", "srt", "sp":
+		longFormValue = getCombinedLongForm(value, valueMap)
+	default:
+		longFormValue, ok = valueMap[value]
+		if !ok {
+			longFormValue = value // If no mapping found, use the original value
+		}
+	}
+
+	return longFormKey, longFormValue
+}
+
+func getLongFormServiceSAS(key, value string) (string, string) {
+	// Mapping from short form to long form for keys
+	keyMap := map[string]string{
+		"sv":  "signedVersion",
+		"ss":  "signedServices",
+		"srt": "signedResourceTypes",
+		"sp":  "signedPermissions",
+		"st":  "signedStart Time",
+		"se":  "signedExpiry Time",
+		"sip": "signedIP",
+		"spr": "signedProtocol",
+		"ses": "signedEncriptionScope",
+		"sig": "signature",
+	}
+
+	// Mapping from short form to long form for values
+	valueMap := map[string]string{
+		"r": "Read",
+		"w": "Write",
+		"d": "Delete",
+		"y": "Permanent Delete",
+		"l": "List",
+		"a": "Add",
+		"c": "Create or Container[srt]",
+		"u": "Update",
+		"p": "Process",
+		"t": "Tag or Table[ss]",
+		"f": "Filter or File[ss]",
+		"i": "Set Immutability Policy",
+		"b": "Blob",
+		"q": "Queue",
+		"s": "Service",
+		"o": "Object",
+	}
+
+	longFormKey, ok := keyMap[key]
+	if !ok {
+		longFormKey = key // If no mapping found, use the original key
+	}
+
+	longFormValue := ""
+	for _, char := range value {
+		longForm, ok := valueMap[string(char)]
+		if ok {
+			if longFormValue != "" {
+				longFormValue += ", "
+			}
+			longFormValue += longForm
+		}
+	}
+	if longFormValue == "" {
+		longFormValue = value // If no mapping found, use the original value
+	}
+
+	return longFormKey, longFormValue
+}
+
+func getLongFormDelegationSAS(key, value string) (string, string) {
+	// Mapping from short form to long form for keys
+	keyMap := map[string]string{
+		"sv":  "signedVersion",
+		"ss":  "signedServices",
+		"srt": "signedResourceTypes",
+		"sp":  "signedPermissions",
+		"st":  "signedStart Time",
+		"se":  "signedExpiry Time",
+		"sip": "signedIP",
+		"spr": "signedProtocol",
+		"ses": "signedEncriptionScope",
+		"sig": "signature",
+	}
+
+	// Mapping from short form to long form for values
+	valueMap := map[string]string{
+		"r": "Read",
+		"w": "Write",
+		"d": "Delete",
+		"y": "Permanent Delete",
+		"l": "List",
+		"a": "Add",
+		"c": "Create or Container[srt]",
+		"u": "Update",
+		"p": "Process",
+		"t": "Tag or Table[ss]",
+		"f": "Filter or File[ss]",
+		"i": "Set Immutability Policy",
+		"b": "Blob",
+		"q": "Queue",
+		"s": "Service",
+		"o": "Object",
+	}
+
+	longFormKey, ok := keyMap[key]
+	if !ok {
+		longFormKey = key // If no mapping found, use the original key
+	}
+
+	longFormValue := ""
+	for _, char := range value {
+		longForm, ok := valueMap[string(char)]
+		if ok {
+			if longFormValue != "" {
+				longFormValue += ", "
+			}
+			longFormValue += longForm
+		}
+	}
+	if longFormValue == "" {
+		longFormValue = value // If no mapping found, use the original value
+	}
+
+	return longFormKey, longFormValue
+}
+
+func getCombinedLongForm(value string, valueMap map[string]string) string {
+	longFormValue := ""
+	for _, char := range value {
+		longForm, ok := valueMap[string(char)]
+		if ok {
+			if longFormValue != "" {
+				longFormValue += ", "
+			}
+			longFormValue += longForm
+		}
+	}
+	if longFormValue == "" {
+		longFormValue = value // If no mapping found, use the original value
+	}
+	return longFormValue
 }
