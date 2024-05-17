@@ -8,10 +8,12 @@ If you are frustrated by this process, often repeated multiple times a day, then
 
 ---    
 ### Features
-- Offline parsing to keep your URL and Params confidential
-- Allows you to pipe-in the url from the command line via stdin
-- [*New Feature] Check the final destination (after redirects) of a URL
-- [*New Feature] **Proxy** (`-p`) to allow to forward proxy the traffic for further inspection to Burp (or your proxy of choice) 
+- Offline parsing to keep your URL and Query String Parameters confidential.
+- Allows you to pipe-in (`|`) the URL from the command line via `stdin`.
+- Check the final destination (`-f`) after redirects of a URL.
+- **Proxy** (`-p`) to allow to forward proxy the traffic for further inspection to Burp (or your proxy of choice)  . 
+- Check Azure Blob Storage SAS URIs (`sas`) for type & parse the parameters with details of what each of those parameters mean in long form.
+- Parse cookies 🍪 with `-c`.
 
 ---    
 ## Example use cases:

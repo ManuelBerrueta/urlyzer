@@ -69,12 +69,12 @@ func main() {
 		values := parsedURL.Query()
 		// Identify the type of SAS URI
 		sasType := identifySASURIType(values)
-		fmt.Printf("\033[31mSAS URI Type: %s\033[0m\n", sasType)
+		fmt.Printf("%sSAS URI Type:%s %s\n", Red, Green, sasType)
 
 		// Print the parsed query parameters
 		for key, value := range values {
 			longFormName, longFormValue := getLongForm(sasType, key, value[0]) // Assuming each key has only one value
-			fmt.Printf("%s=%s\t||\t%s = %s\n", key, value[0], longFormName, longFormValue)
+			fmt.Printf("   %s%s=%s%s   %s||%s  %s=%s%s\n", Cyan, key, Yellow, value[0], Reset, Cyan, longFormName, Yellow, longFormValue)
 		}
 	} else if *checkFinalURLDestination {
 		finalDestination, headers, statusCode, err := getFinalDestination(proxyURL, inputURL)
