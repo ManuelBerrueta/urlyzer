@@ -99,41 +99,50 @@ func main() {
 		}
 
 		// Scheme (Protocol)
-		fmt.Printf("\033[1;36mScheme:\033[0m %s\n", parsedURL.Scheme)
+		fmt.Printf("%sScheme:%s %s\n", Cyan, Reset, parsedURL.Scheme)
 
 		// UserInfo
 		if parsedURL.User.String() != "" {
-			fmt.Printf("\033[1;36mUserInfo:\033[0m %s\n", parsedURL.User)
+			fmt.Printf("%sUserInfo:%s %s\n", Cyan, Reset, parsedURL.User)
 		}
 
 		// Host
-		fmt.Printf("\033[1;36mHost:\033[0m %s\n", parsedURL.Hostname())
+		fmt.Printf("%sHost:%s %s\n", Cyan, Reset, parsedURL.Hostname())
 
 		// Port
 		if parsedURL.Port() != "" {
-			fmt.Printf("\033[1;36mPort:\033[0m %s\n", parsedURL.Port())
+			fmt.Printf("%sPort:%s %s\n", Cyan, Reset, parsedURL.Port())
 		}
 
 		// Path
-		fmt.Printf("\033[1;36mPath:\033[0m %s\n", parsedURL.Path)
+		fmt.Printf("%sPath:%s %s\n", Cyan, Reset, parsedURL.Path)
 
 		// Query String
 		if parsedURL.RawQuery != "" {
-			fmt.Printf("\033[1;36mQuery String:\033[0m %s\n", parsedURL.RawQuery)
+			fmt.Printf("%sQuery String:%s %s\n", Red, Reset, parsedURL.RawQuery)
 
 			// Parse query parameters
 			queryParams, _ := url.ParseQuery(parsedURL.RawQuery)
 			if len(queryParams) > 0 {
-				fmt.Println("\033[1;36mQuery Parameters:\033[0m")
+				fmt.Printf("%sQuery Parameters:%s\n", Yellow, Reset)
 				for key, values := range queryParams {
-					fmt.Printf("  \033[1;32m%s:\033[0m %s\n", key, strings.Join(values, ", "))
+					fmt.Printf("  %s%s:%s %s\n", Green, key, Reset, strings.Join(values, ", "))
 				}
 			}
 		}
 
 		// Fragment (Hash)
 		if parsedURL.Fragment != "" {
-			fmt.Printf("\033[1;36mFragment:\033[0m %s\n", parsedURL.Fragment)
+			fmt.Printf("%sFragment:%s %s\n", Red, Reset, parsedURL.Fragment)
+
+			// Parse fragment as query parameters
+			fragmentParams, _ := url.ParseQuery(parsedURL.Fragment)
+			if len(fragmentParams) > 0 {
+				fmt.Printf("%sFragment Parameters:%s\n", Yellow, Reset)
+				for key, values := range fragmentParams {
+					fmt.Printf("  %s%s:%s %s\n", Green, key, Reset, strings.Join(values, ", "))
+				}
+			}
 		}
 	}
 }
