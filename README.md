@@ -6,7 +6,7 @@ If you find it useful, consider giving us a ⭐ star 👆 😉
 ### Why?
 Frequently, you may encounter lengthy URLs containing various parameters. If you are trying to analyze these parameters in the query string or in a fragment, you may paste it into a text/code editor and break them apart or search for a certain parameter and value. Also, you may often have to decode some of it (if it is URL encoded), which means you have to also copy and paste that to another terminal tool or some other tool like Burp’s Decoder/CyberChef.
 
-> It turns out that also URL Fragments (`#`) may also contain query strings. One such case is with "OAuth2", and `urlyzer` also parses these!
+> It turns out that also URL Fragments (`#`) may also contain query strings. One such case is with **OpenID Connect (OIDC)**, and `urlyzer` also parses these!
 
 If you are frustrated by this process, often repeated multiple times a day, then this 🛠 tool is for you!
 
