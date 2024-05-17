@@ -1,10 +1,14 @@
 # urlyzer
-**`urlyzer`** is a tool to help with analyzing URLs, allowing you to quickly dissect and easily visualize all the parameters offline to keep your URL and Params confidential. If you find it useful, consider giving us a ⭐ star 👆 😉
+**`urlyzer`** is a tool to help with analyzing URLs, allowing you to quickly dissect and easily visualize all the parameters offline to keep your URL and Params confidential. 
+
+If you find it useful, consider giving us a ⭐ star 👆 😉
 
 ### Why?
-There is very often times when you have a really long URL with all kinds of different parameters. When you are trying to analyze the parameters in the query string you may paste it into a text/code editor and break them apart or search for a certain parameter and value. Also, you may often have to decode some of it (if it is URL encoded), which means you have to also copy and paste that to another terminal tool or some other tool like Burp’s Decoder/CyberChef. 
+Frequently, you may encounter lengthy URLs containing various parameters. If you are trying to analyze these parameters in the query string or in a fragment, you may paste it into a text/code editor and break them apart or search for a certain parameter and value. Also, you may often have to decode some of it (if it is URL encoded), which means you have to also copy and paste that to another terminal tool or some other tool like Burp’s Decoder/CyberChef.
 
-If you are frustrated by this process, often repeated multiple times a day, then this tool is for you!
+> It turns out that also URL Fragments (`#`) may also contain query strings. One such case is with "OAuth2", and `urlyzer` also parses these!
+
+If you are frustrated by this process, often repeated multiple times a day, then this 🛠 tool is for you!
 
 ---    
 ### Features
@@ -13,6 +17,7 @@ If you are frustrated by this process, often repeated multiple times a day, then
 - Check the final destination (`-f`) after redirects of a URL.
 - **Proxy** (`-p`) to allow to forward proxy the traffic for further inspection to Burp (or your proxy of choice)  . 
 - Check Azure Blob Storage SAS URIs (`sas`) for type & parse the parameters with details of what each of those parameters mean in long form.
+  -  More support coming to this soon!
 - Parse cookies 🍪 with `-c`.
 
 ---    
