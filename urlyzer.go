@@ -98,6 +98,11 @@ func main() {
 			log.Fatalf("Error parsing URL: %v", err)
 		}
 
+		oauthFlow := oauthFlowChecker(parsedURL)
+		if oauthFlow != "" {
+			fmt.Printf("%sOAuth Flow Identified:%s %s\n", Red, Green, oauthFlow)
+		}
+
 		// Scheme (Protocol)
 		fmt.Printf("%sScheme:%s %s\n", Cyan, Reset, parsedURL.Scheme)
 
@@ -441,4 +446,24 @@ func getCombinedLongForm(value string, valueMap map[string]string) string {
 		longFormValue = value // If no mapping found, use the original value
 	}
 	return longFormValue
+}
+
+func oauthFlowChecker(parsedURL *url.URL) string {
+	// OAuth Flow Identification
+	oauthFlow := ""
+	if strings.Contains(parsedURL.Path, "/authorize") {
+		if _, present := parsedURL.Query()["response_type"]; present {
+			oauthFlow = "Authorization Code Flow"
+		} else if _, present := parsedURL.Query()["response_mode"]; present {
+			oauthFlow = "Implicit Flow"
+		}
+	} else if strings.Contains(parsedURL.Path, "/token") {
+		if _, present := parsedURL.Query()["grant_type"]; present {
+			oauthFlow = "Client Credentials Flow"
+		} else if _, present := parsedURL.Query()["refresh_token"]; present {
+			oauthFlow = "Refresh Token Flow"
+		}
+	}
+
+	return oauthFlow
 }
