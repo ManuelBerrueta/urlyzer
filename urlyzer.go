@@ -28,6 +28,8 @@ func main() {
 	checkFinalURLDestination := flag.Bool("f", false, "Check the final destination of a URL after redirects.")
 	cookies := flag.Bool("c", false, "Parse cookies from a cookie header.")
 	sas := flag.Bool("sas", false, "Parse SAS URI & identify it's type.")
+	queryParamsToMod := flag.String("qr", "", "Query string parameters to modify (comma-separated key=value pairs).")
+	queryKeys := flag.String("qs", "", "Query string keys to extract (comma-separated keys).")
 	flag.Parse()
 
 	// Check if input is being piped
@@ -46,7 +48,31 @@ func main() {
 		os.Exit(1)
 	}
 
-	if *cookies {
+	if *queryParamsToMod != "" {
+		// Parse the query string parameters
+		params := parseQueryParams(*queryParamsToMod)
+		// Modify the URL with the new query parameters
+		modifiedURL, err := modifyQueryParams(inputURL, params)
+		if err != nil {
+			log.Fatalf("Error modifying query parameters: %v", err)
+		}
+		fmt.Fprint(os.Stderr, "\033[32mModified URL:\033[0m\n")
+		fmt.Println(modifiedURL)
+
+	} else if *queryKeys != "" {
+		// Parse the query string keys
+		keys := parseQueryKeys(*queryKeys)
+		// Extract the key-value pairs from the URL
+		extractedParams, err := extractQueryParams(inputURL, keys)
+		if err != nil {
+			log.Fatalf("Error extracting query parameters: %v", err)
+		}
+		// Print the extracted key-value pairs
+		fmt.Printf("%sExtracted Query Parameters:%s\n", Green, Reset)
+		for key, value := range extractedParams {
+			fmt.Printf("  %s%s:%s %s\n", Blue, key, Reset, value)
+		}
+	} else if *cookies {
 		// Parse the cookie header from the input
 		cookiesMap, err := parseCookies(inputURL)
 		if err != nil {
@@ -441,4 +467,52 @@ func getCombinedLongForm(value string, valueMap map[string]string) string {
 		longFormValue = value // If no mapping found, use the original value
 	}
 	return longFormValue
+}
+
+func parseQueryParams(queryParams string) map[string]string {
+	params := make(map[string]string)
+	pairs := strings.Split(queryParams, ",")
+	for _, pair := range pairs {
+		kv := strings.SplitN(pair, "=", 2)
+		if len(kv) == 2 {
+			params[kv[0]] = kv[1]
+		}
+	}
+	return params
+}
+
+func modifyQueryParams(inputURL string, params map[string]string) (string, error) {
+	parsedURL, err := url.Parse(inputURL)
+	if err != nil {
+		return "", err
+	}
+
+	query := parsedURL.Query()
+	for key, value := range params {
+		query.Set(key, value)
+	}
+	parsedURL.RawQuery = query.Encode()
+
+	return parsedURL.String(), nil
+}
+
+func parseQueryKeys(queryKeys string) []string {
+	return strings.Split(queryKeys, ",")
+}
+
+func extractQueryParams(inputURL string, keys []string) (map[string]string, error) {
+	parsedURL, err := url.Parse(inputURL)
+	if err != nil {
+		return nil, err
+	}
+
+	query := parsedURL.Query()
+	extractedParams := make(map[string]string)
+	for _, key := range keys {
+		if value, exists := query[key]; exists {
+			extractedParams[key] = value[0] // Assuming each key has only one value
+		}
+	}
+
+	return extractedParams, nil
 }
