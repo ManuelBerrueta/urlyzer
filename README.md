@@ -6,7 +6,7 @@ If you find it useful, consider giving `urlyzer` a ⭐ star 👆 😉
 ### Why?
 Frequently, you may encounter lengthy URLs containing various parameters. If you are trying to analyze these parameters in the query string or in a fragment, you may paste it into a text/code editor and break them apart or search for a certain parameter and value. Also, you may often have to decode some of it (if it is URL encoded), which means you have to also copy and paste that to another terminal tool or some other tool like Burp’s Decoder/CyberChef.
 
-> It turns out that also URL Fragments (`#`) may also contain query strings. One such case is with **OpenID Connect (OIDC)**, and `urlyzer` also parses these!
+> It turns out that also URL Fragments (`#`) may also contain query strings. One such case is with **OAuth 2.0** + **OpenID Connect (OIDC)**, and `urlyzer` also parses these!
 
 If you are frustrated by this process, often repeated multiple times a day, then this 🛠 tool is for you!
 
@@ -51,34 +51,6 @@ Query Parameters:
 Fragment: MyFragment
 ```
 
-### Running final destination analysis of a URL
-This is a case where the URL may have one or multiple redirects and you wish to check it's final destination. 
-To do the analysis, pass in the `-f` flag after `urlyzer`:
-```shell
-urlyzer -f "https://aka.ms/powershell-release?tag=lts"
-```
-**Example Output**
-```yaml
-Final Destination: https://github.com/Powershell/Powershell/releases/tag/v7.2.13
-Status Code: 200
-Headers:
-  Location: [https://powershell-release-redirect.azurewebsites.net/api/powershell-release-redirect?code=GyM2EB/tN8KmH2swJp/o/TdJ72z9CLP2/g3lBa9gnPWDZOAbDrD5EA==&tag=lts]
-  X-Response-Cache-Status: [True]
-  Pragma: [no-cache]
-  Cache-Control: [max-age=0, no-cache, no-store]
-  Date: [Sun, 24 Sep 2023 20:21:23 GMT]
-  Strict-Transport-Security: [max-age=31536000 ; includeSubDomains]
-  Content-Length: [0]
-  Server: [Kestrel]
-  Request-Context: [appId=cid-v1:9b037ab9-fa5a-4c09-81bd-41ffa859f01e]
-  Expires: [Sun, 24 Sep 2023 20:21:23 GMT]
-```
-#### Using the Proxy
-If you want to forward proxy the traffic of the final destination analysis for further investigations you can use the `-p` flag followed by the proxy address:
-```Terminal
-echo " https://aka.ms/powershell-release?tag=lts" | ./urlyzer -f -p "http://127.0.0.1:8080"
-```
-
 ### Parsing cookies
 Sometimes looking through cookies in the requests can be messy, especially when there are a bunch and really long ones.
 You can use urlyzer like this to parse them:
@@ -106,6 +78,38 @@ If you have a long URL with lots of parameters, you might just be interested in 
 You can query the values of just the parameters you are interested in:
 ```shell
 urlyzer -qs response_type "https://www.example.com/path/towin?param1=value1&response_type=code#MyFragment"
+```
+Query for more than one parameter:
+```shell
+urlyzer -qs response_type,param1 "https://www.example.com/path/towin?param1=value1&response_type=code#MyFragment"
+```
+
+### Running final destination analysis of a URL
+This is a case where the URL may have one or multiple redirects and you wish to check it's final destination. 
+To do the analysis, pass in the `-f` flag after `urlyzer`:
+```shell
+urlyzer -f "https://aka.ms/powershell-release?tag=lts"
+```
+**Example Output**
+```yaml
+Final Destination: https://github.com/Powershell/Powershell/releases/tag/v7.2.13
+Status Code: 200
+Headers:
+  Location: [https://powershell-release-redirect.azurewebsites.net/api/powershell-release-redirect?code=GyM2EB/tN8KmH2swJp/o/TdJ72z9CLP2/g3lBa9gnPWDZOAbDrD5EA==&tag=lts]
+  X-Response-Cache-Status: [True]
+  Pragma: [no-cache]
+  Cache-Control: [max-age=0, no-cache, no-store]
+  Date: [Sun, 24 Sep 2023 20:21:23 GMT]
+  Strict-Transport-Security: [max-age=31536000 ; includeSubDomains]
+  Content-Length: [0]
+  Server: [Kestrel]
+  Request-Context: [appId=cid-v1:9b037ab9-fa5a-4c09-81bd-41ffa859f01e]
+  Expires: [Sun, 24 Sep 2023 20:21:23 GMT]
+```
+#### Using the Proxy
+If you want to forward proxy the traffic of the final destination analysis for further investigations you can use the `-p` flag followed by the proxy address:
+```Terminal
+echo " https://aka.ms/powershell-release?tag=lts" | ./urlyzer -f -p "http://127.0.0.1:8080"
 ```
 
 ---    
